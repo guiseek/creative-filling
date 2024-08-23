@@ -14,7 +14,7 @@ onToolbarSelectText(() => {
     type: 'number',
     name: 'size',
     step: '0.1',
-    value: '3.2',
+    value: '4.8',
   })
 
   const bold = new Input({

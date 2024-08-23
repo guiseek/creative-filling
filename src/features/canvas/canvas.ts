@@ -7,120 +7,93 @@ class Canvas extends HTMLCanvasElement {
   context: CanvasRenderingContext2D | null
 
   #layers: Layer[] = []
-
-  #layer: Layer | null = null
+  #activeLayer: Layer | null = null
 
   constructor() {
     super()
     this.context = this.getContext('2d')
   }
 
-  addLayer = (layer: Layer) => {
+  addLayer(layer: Layer) {
     layer.setOrder(this.#layers.length)
     this.#layers.push(layer)
   }
 
   connectedCallback() {
-    this.onmousedown = this.#onMouseDown
-    this.onmousemove = this.#onMouseMove
-    this.onmouseup = this.#onMouseUp
+    this.onmousedown = this.#handleMouseDown
+    this.onmousemove = this.#handleMouseMove
+    this.onmouseup = this.#handleMouseUp
   }
 
-  render = async () => {
+  async render() {
     if (!this.context) return
 
     this.context.clearRect(0, 0, this.width, this.height)
 
-    this.#layers
+    const layers = this.#layers
       .filter((layer) => layer.active)
       .sort((a, b) => a.order - b.order)
-      .map(async (layer) => {
-        if (!this.context) return
 
-        await layer.render()
-        const {width, height} = layer
-        const {x, y} = layer.position
-        this.context?.drawImage(layer, x, y, width, height)
-
-        if (layer.hovered) {
-          const path = new Path2D()
-          path.rect(x, y, width, height)
-
-          this.context.lineWidth = 2
-          this.context.strokeStyle = 'rgba(255, 13, 233, 0.4)'
-          this.context.stroke(path)
-        }
-      })
+    for (const layer of layers) {
+      await layer.render()
+      this.#drawLayer(layer)
+    }
   }
 
-  setSize = (size: number) => {
+  setSize(size: number) {
     this.width = size
     this.height = size
   }
 
-  #onMouseDown = ({offsetX, offsetY}: MouseEvent) => {
+  #handleMouseDown = ({offsetX, offsetY}: MouseEvent) => {
     const position = new Vector2(offsetX, offsetY)
+    const collidingLayers = this.#getCollidingLayers(position)
 
-    const colliders = this.#layers.filter(({rect}) =>
-      position.isCollision(rect)
-    )
+    if (collidingLayers.length > 0) {
+      const topLayer = this.#getTopLayer(collidingLayers)
+      const resizeDirection = this.#getResizeDirection(topLayer, position)
 
-    if (colliders.length > 0) {
-      const layer = colliders.reduce((highest, current) => {
-        return current.order > highest.order ? current : highest
-      }, colliders[0])
+      this.#activeLayer = topLayer
 
-      const direction = this.#getResizeDirection(layer, position)
-
-      if (direction.x || direction.y) {
-        this.#layer = layer
-        layer.startResize(direction)
+      if (resizeDirection.x || resizeDirection.y) {
+        topLayer.startResize(resizeDirection)
       } else {
-        this.#layer = layer
-        layer.startDrag(position)
+        topLayer.startDrag(position)
       }
     }
   }
 
-  #onMouseMove = (event: MouseEvent) => {
+  #handleMouseMove = (event: MouseEvent) => {
     const {offsetX, offsetY} = event
     const position = new Vector2(offsetX, offsetY)
 
-    if (this.#layer && this.#layer.dragging) {
-      this.#layer.dragTo(position)
-      this.render()
-    } else if (this.#layer && this.#layer.resizable && this.#layer.resizing) {
-      this.#layer.resizeTo(position)
-      this.render()
+    if (this.#activeLayer) {
+      this.#updateLayerPositionOrSize(position)
     } else {
-      let hoveredLayer: Layer | null = null
+      this.#updateHoveredLayer(position)
+    }
 
-      for (const layer of this.#layers) {
-        if (layer.resizable && position.isCollision(layer.rect)) {
-          hoveredLayer = layer
-          const resizeDirection = this.#getResizeDirection(layer, position)
+    this.render()
+  }
 
-          if (resizeDirection.x || resizeDirection.y) {
-            this.style.cursor =
-              resizeDirection.x && resizeDirection.y
-                ? 'nwse-resize'
-                : resizeDirection.x
-                ? 'ew-resize'
-                : 'ns-resize'
-          } else {
-            this.style.cursor = 'default'
-          }
-        } else {
-          layer.setHovered(false)
-        }
-      }
-
-      if (hoveredLayer) {
-        hoveredLayer.setHovered(true)
-      }
-
+  #handleMouseUp = () => {
+    if (this.#activeLayer) {
+      this.#activeLayer.resizing
+        ? this.#activeLayer.stopResize()
+        : this.#activeLayer.stopDrag()
+      this.#activeLayer = null
       this.render()
     }
+  }
+
+  #getCollidingLayers(position: Vector2) {
+    return this.#layers.filter((layer) => position.isCollision(layer.rect))
+  }
+
+  #getTopLayer(layers: Layer[]) {
+    return layers.reduce((topLayer, currentLayer) =>
+      currentLayer.order > topLayer.order ? currentLayer : topLayer
+    )
   }
 
   #getResizeDirection(layer: Layer, position: Vector2) {
@@ -133,16 +106,58 @@ class Canvas extends HTMLCanvasElement {
     }
   }
 
-  #onMouseUp = () => {
-    if (this.#layer) {
-      if (this.#layer.resizing) {
-        this.#layer.stopResize()
-      } else {
-        this.#layer.stopDrag()
+  #updateLayerPositionOrSize(position: Vector2) {
+    if (this.#activeLayer) {
+      if (this.#activeLayer.resizing) {
+        this.#activeLayer.resizeTo(position)
+      } else if (this.#activeLayer.dragging) {
+        this.#activeLayer.dragTo(position)
       }
-      this.#layer = null
-      this.render().then()
     }
+  }
+
+  #updateHoveredLayer(position: Vector2) {
+    let cursorStyle = 'default'
+
+    this.#layers.forEach((layer) => {
+      if (layer.resizable && position.isCollision(layer.rect)) {
+        const resizeDirection = this.#getResizeDirection(layer, position)
+
+        if (resizeDirection.x || resizeDirection.y) {
+          cursorStyle =
+            resizeDirection.x && resizeDirection.y
+              ? 'nwse-resize'
+              : resizeDirection.x
+              ? 'ew-resize'
+              : 'ns-resize'
+        }
+
+        layer.setHovered(true)
+      } else {
+        layer.setHovered(false)
+      }
+    })
+
+    this.style.cursor = cursorStyle
+  }
+
+  #drawLayer(layer: Layer) {
+    const {width, height} = layer
+    const {x, y} = layer.position
+    this.context?.drawImage(layer, x, y, width, height)
+
+    if (layer.hovered) {
+      this.#drawLayerBorder(x, y, width, height)
+    }
+  }
+
+  #drawLayerBorder(x: number, y: number, width: number, height: number) {
+    const path = new Path2D()
+    path.rect(x, y, width, height)
+
+    this.context!.lineWidth = 2
+    this.context!.strokeStyle = 'rgba(255, 13, 233, 0.4)'
+    this.context!.stroke(path)
   }
 }
 

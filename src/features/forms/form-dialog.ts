@@ -1,11 +1,12 @@
 import {assign, builtIn} from '@websqnl/elements/shared'
 import {dispatch, type Event} from '@websqnl/event-flow'
 import {Button, Footer, Input} from '@websqnl/elements'
+import {Dialog} from '@shared/elements'
 import {FormGroup} from './form-group'
 import {values} from '@websqnl/utils'
 
 @builtIn('dialog', 'cf-form-dialog')
-export class FormDialog<T extends object> extends HTMLDialogElement {
+export class FormDialog<T extends object> extends Dialog {
   form: FormGroup<T>
 
   actions: Record<string, Button>
@@ -23,7 +24,6 @@ export class FormDialog<T extends object> extends HTMLDialogElement {
         ev.preventDefault()
         dispatch(stateEvent(this.form.value))
         this.close()
-        this.remove()
       },
     })
 
@@ -37,7 +37,6 @@ export class FormDialog<T extends object> extends HTMLDialogElement {
         textContent: 'Cancel',
         onclick: () => {
           this.close('cancel')
-          this.remove()
         },
       }),
     }

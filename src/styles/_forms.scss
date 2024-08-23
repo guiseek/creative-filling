@@ -18,31 +18,30 @@ dialog {
       align-self: center;
       padding: 0.4em 0.6em;
       border-radius: 0.4em;
-      border: 0.18em solid rgb(var(--cf-primary-rgb));
+      border: 0.18em solid rgba(var(--cf-primary-rgb), 0.6);
       background-color: #f9f9f9;
 
-      &[type="text"] {
+      &[type='text'] {
         min-width: 12em;
       }
 
-      &[type="color"] {
+      &[type='color'] {
         min-width: 3em;
         padding: 0;
       }
 
-      &[type="number"] {
+      &[type='number'] {
         min-width: 3em;
       }
-      
-      &[type="checkbox"] {
+
+      &[type='checkbox'] {
         min-width: 2em;
       }
     }
-  
+
     button {
       border: 0.18em solid rgb(var(--cf-onsurface-rgb));
     }
-  
   }
 
   footer {
