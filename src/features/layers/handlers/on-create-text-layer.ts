@@ -3,10 +3,10 @@ import {dispatch} from '@websqnl/event-flow'
 import {onCreateTextLayer} from '../events'
 import {TextLayer} from '../text-layer'
 
-onCreateTextLayer(async ({text, size, bold}) => {
+onCreateTextLayer(async ({text, size, color, bold}) => {
   const layer = new TextLayer(540, 540, 0, 0)
 
-  layer.setText(text).setSize(size)
+  layer.setText(text).setSize(size).setColor(color)
 
   if (bold) {
     await layer.setWeight('bold').render()
