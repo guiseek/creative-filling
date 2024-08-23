@@ -1,6 +1,8 @@
 import {Layer} from './layer'
 
 export class TextLayer extends Layer {
+  type: LayerType = 'text'
+
   protected _text = ''
 
   protected _color = '#111111'

@@ -2,6 +2,8 @@
 
 declare const root: HTMLDivElement
 
+type TypeValue = 'boolean' | 'date' | 'number' | 'string'
+
 interface Vector2Like {
   x: number
   y: number
@@ -19,9 +21,83 @@ interface RectLike {
   h: number
 }
 
-type ToolbarAction = 'image' | 'text'
+type LayerType = 'image' | 'text'
 
 type TextWeight = 'bold' | 'normal'
+
+interface CanvasLike {
+  removeLayer(layer: LayerLike)
+}
+
+type ParentLayer = CanvasLike
+
+interface LayerLike extends OffscreenCanvas {
+  id: string
+
+  type: LayerType
+
+  active: boolean
+
+  order: number
+
+  position: Vector2Like
+
+  dragging: boolean
+
+  resizing: boolean
+
+  draggable: boolean
+
+  resizable: boolean
+
+  hovered: boolean
+
+  offset: Vector2Like
+
+  rect: RectLike
+
+  render(): Promise<void>
+
+  setActive(active: boolean): this
+
+  setOrder(order: number): this
+
+  setDraggable(draggable: boolean): this
+
+  setResizable(resizable: boolean): this
+
+  // setResizing(resizing: boolean): this
+
+  setHovered(hovered: boolean): this
+
+  startDrag(vector: Vector2Like): void
+
+  dragTo(vector: Vector2Like): void
+
+  stopDrag(): void
+
+  startResize(direction: Vector2Direction): void
+
+  resizeTo(vector: Vector2Like): void
+
+  stopResize(): void
+}
+
+interface ContextLike extends HTMLMenuElement {
+  layer: LayerLike
+  open({x, y}: Vector2Like): void
+  close(): void
+}
+
+interface ContextOpenEvent {
+  layer: LayerLike
+  position: Vector2Like
+}
+
+interface ContextCloseEvent {
+  option: string | null
+  context: ContextLike
+}
 
 interface TextForm {
   text: string
@@ -35,15 +111,18 @@ interface StateEventMap {
 
   'canvas.render.request': void
   'canvas.update.size': CanvasSize
-  'canvas.add.layer': Layer
+  'canvas.add.layer': LayerLike
 
   'layer.create.image': string
   'layer.create.text': TextForm
 
   'toolbar.select.image': void
   'toolbar.select.text': void
-  'toolbar.selected': ToolbarAction
-  
+  'toolbar.selected': LayerType
+
+  'context.open': ContextOpenEvent
+  'context.close': ContextCloseEvent
+
   'window.resize': number
 }
 

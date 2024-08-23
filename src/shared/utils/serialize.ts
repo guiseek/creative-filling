@@ -1,5 +1,6 @@
-import {entries, parse, Value} from '@websqnl/utils'
+import {entries, Value} from '@websqnl/utils'
 import {formValue} from './form-value'
+import {parse} from './parse'
 
 export const serialize = <T extends object>(form: T | object): T => {
   const data = form instanceof HTMLFormElement ? formValue<T>(form) : form

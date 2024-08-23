@@ -13,18 +13,20 @@ export class Toolbar extends HTMLMenuElement {
   }
 
   connectedCallback() {
+    this.classList.add('cf-toolbar')
+
     for (const button of values(this.buttons)) {
       this.append(button)
 
       button.addEventListener('click', () => {
-        const action = button.value as ToolbarAction
+        const action = button.value as LayerType
 
         dispatch(selectToolbar(action))
       })
     }
   }
 
-  #button(innerHTML: string, value: ToolbarAction, title: string) {
+  #button(innerHTML: string, value: LayerType, title: string) {
     return new Button({innerHTML, value, title, type: 'button'})
   }
 }

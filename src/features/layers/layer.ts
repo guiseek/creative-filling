@@ -1,11 +1,15 @@
 import {Vector2} from '@shared/utils'
 
-export abstract class Layer extends OffscreenCanvas {
+export abstract class Layer extends OffscreenCanvas implements LayerLike {
   protected context: OffscreenCanvasRenderingContext2D | null
+
+  protected _id: string
 
   protected _position = new Vector2()
 
   protected _offset = new Vector2()
+
+  protected _parent?: ParentLayer
 
   protected _draggable = true
 
@@ -25,12 +29,20 @@ export abstract class Layer extends OffscreenCanvas {
 
   protected _order = 1
 
+  get id() {
+    return this._id
+  }
+
   get position() {
     return this._position
   }
 
   get dragging() {
     return this._dragging
+  }
+
+  get draggable() {
+    return this._draggable
   }
 
   get resizing() {
@@ -68,10 +80,17 @@ export abstract class Layer extends OffscreenCanvas {
 
   constructor(w: number, h: number, x = 0, y = 0) {
     super(w, h)
+
     this._position = new Vector2(x, y)
+
     this.context = this.getContext('2d')
+
     this._aspectRatio = w / h
+
+    this._id = crypto.randomUUID()
   }
+
+  abstract type: LayerType
 
   abstract render(): Promise<void>
 

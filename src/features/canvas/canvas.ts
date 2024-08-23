@@ -1,25 +1,35 @@
-import {builtIn} from '@websqnl/elements/shared'
-import {Layer} from '@features/layers'
 import {getCustomProperty, Vector2} from '@shared/utils'
+import {builtIn} from '@websqnl/elements/shared'
+import {contextOpen} from '@features/context'
+import {dispatch} from '@websqnl/event-flow'
 
 @builtIn('canvas', 'cf-canvas')
-class Canvas extends HTMLCanvasElement {
+class Canvas extends HTMLCanvasElement implements CanvasLike {
   context: CanvasRenderingContext2D | null
 
-  #layers: Layer[] = []
-  #activeLayer: Layer | null = null
+  #layers: LayerLike[] = []
+  #activeLayer: LayerLike | null = null
+
+  #isContextMenu = false
 
   constructor() {
     super()
     this.context = this.getContext('2d')
   }
 
-  addLayer(layer: Layer) {
-    layer.setOrder(this.#layers.length)
+  addLayer(layer: LayerLike) {
+    layer.setOrder(this.#layers.length + 1)
     this.#layers.push(layer)
   }
 
+  removeLayer(layer: LayerLike) {
+    const index = this.#layers.findIndex((l) => l.id === layer.id)
+    this.#layers.splice(index, 1)
+    this.render().then()
+  }
+
   connectedCallback() {
+    this.oncontextmenu = this.#onContextMenu
     this.onmousedown = this.#handleMouseDown
     this.onmousemove = this.#handleMouseMove
     this.onmouseup = this.#handleMouseUp
@@ -45,22 +55,47 @@ class Canvas extends HTMLCanvasElement {
     this.height = size
   }
 
-  #handleMouseDown = ({offsetX, offsetY}: MouseEvent) => {
+  setIsContextMenu(isContextMenu: boolean) {
+    this.#isContextMenu = isContextMenu
+  }
+
+  #onContextMenu = (e: MouseEvent) => {
+    this.setIsContextMenu(true)
+
+    e.preventDefault()
+
+    const {offsetX, offsetY} = e
     const position = new Vector2(offsetX, offsetY)
     const collidingLayers = this.#getCollidingLayers(position)
 
     if (collidingLayers.length > 0) {
-      const topLayer = this.#getTopLayer(collidingLayers)
-      const resizeDirection = this.#getResizeDirection(topLayer, position)
-
-      this.#activeLayer = topLayer
-
-      if (resizeDirection.x || resizeDirection.y) {
-        topLayer.startResize(resizeDirection)
-      } else {
-        topLayer.startDrag(position)
-      }
+      const layer = this.#getTopLayer(collidingLayers)
+      const position = {x: e.pageX, y: e.pageY}
+      dispatch(contextOpen({layer, position}))
     }
+    // dispatch(contextOpen({x: offsetX, y: offsetY}))
+  }
+
+  #handleMouseDown = ({offsetX, offsetY}: MouseEvent) => {
+    setTimeout(() => {
+      if (this.#isContextMenu) return
+
+      const position = new Vector2(offsetX, offsetY)
+      const collidingLayers = this.#getCollidingLayers(position)
+
+      if (collidingLayers.length > 0) {
+        const topLayer = this.#getTopLayer(collidingLayers)
+        const resizeDirection = this.#getResizeDirection(topLayer, position)
+
+        this.#activeLayer = topLayer
+
+        if (resizeDirection.x || resizeDirection.y) {
+          topLayer.startResize(resizeDirection)
+        } else {
+          topLayer.startDrag(position)
+        }
+      }
+    })
   }
 
   #handleMouseMove = (event: MouseEvent) => {
@@ -91,13 +126,13 @@ class Canvas extends HTMLCanvasElement {
     return this.#layers.filter((layer) => position.isCollision(layer.rect))
   }
 
-  #getTopLayer(layers: Layer[]) {
+  #getTopLayer(layers: LayerLike[]) {
     return layers.reduce((topLayer, currentLayer) =>
       currentLayer.order > topLayer.order ? currentLayer : topLayer
     )
   }
 
-  #getResizeDirection(layer: Layer, position: Vector2) {
+  #getResizeDirection(layer: LayerLike, position: Vector2) {
     const cornerSize = 10
     const rect = layer.rect
 
@@ -142,7 +177,7 @@ class Canvas extends HTMLCanvasElement {
     this.style.cursor = cursorStyle
   }
 
-  #drawLayer(layer: Layer) {
+  #drawLayer(layer: LayerLike) {
     const {width, height} = layer
     const {x, y} = layer.position
     this.context?.drawImage(layer, x, y, width, height)
