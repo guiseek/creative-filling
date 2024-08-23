@@ -6,9 +6,11 @@ export class ImageLayer extends Layer {
   async render() {
     if (!this.context?.drawImage) return
 
+    this.context.clearRect(0, 0, this.width, this.height)
+
     await this.image.decode()
-    const {x, y, w, h} = this.rect
-    this.context.drawImage(this.image, x, y, w, h)
+    const {w, h} = this.rect
+    this.context.drawImage(this.image, 0, 0, w, h)
   }
 
   setSrc(src: string) {

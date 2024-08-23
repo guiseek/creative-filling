@@ -7,6 +7,11 @@ interface Vector2Like {
   y: number
 }
 
+interface Vector2Direction {
+  x: boolean
+  y: boolean
+}
+
 interface RectLike {
   x: number
   y: number

@@ -9,7 +9,15 @@ export abstract class Layer extends OffscreenCanvas {
 
   protected _draggable = true
 
+  protected _resizable = true
+
   protected _dragging = false
+
+  protected _resizing = false
+
+  protected _aspectRatio: number
+
+  protected _resizeDirection = {x: false, y: false}
 
   protected _active = true
 
@@ -21,6 +29,10 @@ export abstract class Layer extends OffscreenCanvas {
 
   get dragging() {
     return this._dragging
+  }
+
+  get resizing() {
+    return this._resizing
   }
 
   get offset() {
@@ -48,8 +60,8 @@ export abstract class Layer extends OffscreenCanvas {
     super(w, h)
     this._position = new Vector2(x, y)
     this.context = this.getContext('2d')
+    this._aspectRatio = w / h
   }
-
 
   abstract render(): Promise<void>
 
@@ -86,5 +98,48 @@ export abstract class Layer extends OffscreenCanvas {
 
   stopDrag() {
     this.setDragging(false)
+  }
+
+  setResizable(resizable: boolean) {
+    this._resizable = resizable
+    return this
+  }
+
+  protected setResizing(resizing: boolean) {
+    this._resizing = resizing
+    return this
+  }
+
+  startResize(direction: Vector2Direction) {
+    this.setResizing(true)
+    this._resizeDirection = direction
+  }
+
+  resizeTo(point: Vector2) {
+    if (this._resizing) {
+      const {x, y} = this._resizeDirection
+
+      if (x && y) {
+        const dx = point.x - this.position.x
+        const dy = point.y - this.position.y
+        const scale = Math.max(dx / this.width, dy / this.height)
+
+        this.width = this.width * scale
+        this.height = this.height * scale
+      } else if (x) {
+        this.width = Math.max(10, point.x - this.position.x)
+        this.height = this.width / this._aspectRatio
+      } else if (y) {
+        this.height = Math.max(10, point.y - this.position.y)
+        this.width = this.height * this._aspectRatio
+      }
+
+      this.render()
+    }
+  }
+
+  stopResize() {
+    this.setResizing(false)
+    this._resizeDirection = {x: false, y: false}
   }
 }

@@ -14,6 +14,8 @@ export class TextLayer extends Layer {
   async render() {
     if (!this.context?.drawImage) return
 
+    this.context.clearRect(0, 0, this.width, this.height)
+
     this.context.fillStyle = this._color
     this.context.font = this.font
 
