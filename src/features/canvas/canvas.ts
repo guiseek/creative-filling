@@ -81,6 +81,7 @@ class Canvas extends HTMLCanvasElement {
       this.#activeLayer.resizing
         ? this.#activeLayer.stopResize()
         : this.#activeLayer.stopDrag()
+
       this.#activeLayer = null
       this.render()
     }
@@ -119,7 +120,7 @@ class Canvas extends HTMLCanvasElement {
   #updateHoveredLayer(position: Vector2) {
     let cursorStyle = 'default'
 
-    this.#layers.forEach((layer) => {
+    for (const layer of this.#layers) {
       if (layer.resizable && position.isCollision(layer.rect)) {
         const resizeDirection = this.#getResizeDirection(layer, position)
 
@@ -136,7 +137,7 @@ class Canvas extends HTMLCanvasElement {
       } else {
         layer.setHovered(false)
       }
-    })
+    }
 
     this.style.cursor = cursorStyle
   }
