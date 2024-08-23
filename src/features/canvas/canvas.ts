@@ -1,6 +1,6 @@
 import {builtIn} from '@websqnl/elements/shared'
 import {Layer} from '@features/layers'
-import {Vector2} from '@shared/utils'
+import {getCustomProperty, Vector2} from '@shared/utils'
 
 @builtIn('canvas', 'cf-canvas')
 class Canvas extends HTMLCanvasElement {
@@ -157,7 +157,10 @@ class Canvas extends HTMLCanvasElement {
     path.rect(x, y, width, height)
 
     this.context!.lineWidth = 2
-    this.context!.strokeStyle = 'rgba(255, 13, 233, 0.4)'
+
+    const style = `rgba(${getCustomProperty('--cf-primary-rgb')}, 0.4)`
+    this.context!.strokeStyle = style
+
     this.context!.stroke(path)
   }
 }
