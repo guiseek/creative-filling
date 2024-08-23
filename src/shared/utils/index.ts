@@ -4,3 +4,4 @@ export * from './math';
 export * from './async';
 export * from './form-value';
 export * from './serialize';
+export * from './throttle';
