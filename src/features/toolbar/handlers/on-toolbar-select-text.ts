@@ -24,7 +24,15 @@ onToolbarSelectText(() => {
     checked: false,
   })
 
-  const dialog = new FormDialog<TextForm>({text, size, bold}, formTextSubmit)
+  const color = new Input({
+    type: 'color',
+    name: 'color',
+    value: '#000000',
+  })
+
+  const controls = {text, size, color, bold}
+
+  const dialog = new FormDialog<TextForm>(controls, formTextSubmit)
 
   document.body.insertAdjacentElement('beforeend', dialog)
 

@@ -15,8 +15,9 @@ class Canvas extends HTMLCanvasElement {
     this.context = this.getContext('2d')
   }
 
-  addLayer = (...layers: Layer[]) => {
-    this.#layers.push(...layers)
+  addLayer = (layer: Layer) => {
+    layer.setOrder(this.#layers.length)
+    this.#layers.push(layer)
   }
 
   connectedCallback() {
@@ -48,9 +49,15 @@ class Canvas extends HTMLCanvasElement {
   #onMouseDown = ({offsetX, offsetY}: MouseEvent) => {
     const position = new Vector2(offsetX, offsetY)
 
-    const layer = this.#layers.find(({rect}) => position.isCollision(rect))
+    const colliders = this.#layers.filter(({rect}) =>
+      position.isCollision(rect)
+    )
 
-    if (layer) {
+    if (colliders.length > 0) {
+      const layer = colliders.reduce((highest, current) => {
+        return current.order > highest.order ? current : highest
+      }, colliders[0])
+
       this.#layer = layer
       layer.startDrag(position)
     }

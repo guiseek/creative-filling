@@ -20,6 +20,7 @@ type TextWeight = 'bold' | 'normal'
 
 interface TextForm {
   text: string
+  color: string
   size: number
   bold: boolean
 }

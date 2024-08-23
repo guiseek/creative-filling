@@ -23,10 +23,10 @@ body {
 #root {
   height: 100%;
   display: flex;
+  flex-flow: row wrap;
   justify-content: center;
   align-items: center;
   gap: 2em;
-  padding: 1em;
 }
 
 input,
