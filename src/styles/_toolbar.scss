@@ -1,0 +1,30 @@
+menu {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 0.2em;
+  max-width: 6em;
+  background-color: #dadada;
+
+  margin: 0;
+  padding: 0.2em;
+  border-radius: 0.2em;
+
+  button {
+    border: none;
+    display: inline-flex;
+    padding: 0;
+    border-radius: 0;
+    border-radius: 0.2em;
+    background-color: #ebebeb;
+    transition: background-color 180ms ease-in-out;
+
+    &:hover {
+      cursor: pointer;
+      background-color: #fafafa;
+    }
+
+    svg {
+      color: rgb(var(--cf-onsurface-rgb));
+    }
+  }
+}

@@ -1,0 +1,55 @@
+@use './styles/toolbar';
+@use './styles/canvas';
+@use './styles/forms';
+
+:root {
+  --cf-primary-rgb: 130, 85, 199;
+  --cf-onprimary-rgb: 255, 255 255;
+  --cf-surface-rgb: 250, 250, 250;
+  --cf-onsurface-rgb: 16, 16, 16;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-size: 1.2em;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#root {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2em;
+  padding: 1em;
+}
+
+input,
+button,
+select {
+  font-size: 0.79em;
+}
+
+button {
+  padding: 0.4em 0.6em;
+  border-radius: 0.4em;
+  display: inline-flex;
+  background-color: #efefef;
+  transition: background-color 180ms ease-in-out;
+
+  > svg {
+    width: 2.4em;
+    height: 2.4em;
+    display: inline-flex;
+  }
+
+  &:hover {
+    cursor: pointer;
+    background-color: #dfdfdf;
+  }
+}

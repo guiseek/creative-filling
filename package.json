@@ -1,0 +1,24 @@
+{
+  "name": "creative-filling",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "sass": "^1.77.8",
+    "typescript": "^5.5.3",
+    "vite": "^5.4.1",
+    "vite-tsconfig-paths": "^5.0.1"
+  },
+  "dependencies": {
+    "@websqnl/di": "^0.0.1",
+    "@websqnl/elements": "^0.6.0",
+    "@websqnl/event-flow": "^0.2.0",
+    "@websqnl/utils": "^0.0.1",
+    "reflect-metadata": "^0.2.2"
+  }
+}

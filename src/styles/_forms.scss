@@ -1,0 +1,36 @@
+dialog {
+  border-radius: 0.6em;
+  border: 0.2em solid rgb(var(--cf-onsurface-rgb));
+  overflow: hidden;
+  
+  padding: 0;
+
+  form {
+    display: flex;
+    flex-direction: column;
+    padding: 1em;
+    gap: 1em;
+
+    input {
+      padding: 0.4em 0.6em;
+      border-radius: 0.4em;
+      border: 0.18em solid rgb(var(--cf-primary-rgb));
+      background-color: #f9f9f9;
+    }
+  
+    button {
+      border: 0.18em solid rgb(var(--cf-onsurface-rgb));
+    }
+  
+  }
+
+  footer {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+  }
+
+  &::backdrop {
+    background-color: rgba(0, 0, 0, 0.6);
+  }
+}
