@@ -38,6 +38,8 @@ interface StateEventMap {
   'toolbar.select.image': void
   'toolbar.select.text': void
   'toolbar.selected': ToolbarAction
+  
+  'window.resize': number
 }
 
 interface Size {
