@@ -4,5 +4,8 @@ export * from './math';
 export * from './styles';
 export * from './async';
 export * from './form-value';
+export * from './get-type';
+export * from './is';
+export * from './parse';
 export * from './serialize';
 export * from './throttle';

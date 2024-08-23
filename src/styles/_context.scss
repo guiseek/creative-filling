@@ -1,0 +1,73 @@
+#cf-context-overlay {
+  position: relative;
+}
+
+menu.cf-context {
+  position: fixed;
+  display: none;
+
+  margin: 0;
+
+  padding: 0.2em;
+
+  flex-direction: column;
+
+  border-radius: 0.6em;
+
+  overflow: hidden;
+
+  background-color: rgb(var(--cf-surface-rgb));
+
+  box-shadow: 0 10px 20px rgba(var(--cf-onsurface-rgb), 0.24);
+
+  hr {
+    width: 100%;
+    border: 0.1em solid rgba(var(--cf-onsurface-rgb), 0.1);
+  }
+
+  button {
+    border: 0;
+
+    padding: 0.4em 0.6em;
+
+    gap: 1em;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    border-radius: 0.3em;
+
+    background-color: rgb(var(--cf-surface-rgb));
+    transition: background-color 250ms ease-in-out;
+
+    svg {
+      width: 24px;
+      color: rgba(var(--cf-onsurface-rgb), 0.4);
+      transition: color 250ms ease-in-out;
+    }
+
+    span {
+      display: inline-flex;
+      font-size: 1.2em;
+      color: rgba(var(--cf-onsurface-rgb), 0.8);
+    }
+
+    span + span {
+      flex: 1;
+      font-size: 0.64em;
+      letter-spacing: 0.1em;
+      justify-content: flex-end;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: rgba(var(--cf-onsurface-rgb), 0.72);
+      text-transform: uppercase;
+    }
+
+    &:hover {
+      background-color: rgba(var(--cf-onsurface-rgb), 0.03);
+
+      svg {
+        color: rgba(var(--cf-onsurface-rgb), 0.8);
+      }
+    }
+  }
+}

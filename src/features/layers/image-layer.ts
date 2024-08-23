@@ -1,6 +1,8 @@
 import {Layer} from './layer'
 
 export class ImageLayer extends Layer {
+  type: LayerType = 'image'
+
   image = new Image(this.width, this.height)
 
   async render() {
