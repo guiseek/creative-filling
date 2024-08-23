@@ -4,9 +4,9 @@ import {onCreateTextLayer} from '../events'
 import {TextLayer} from '../text-layer'
 
 onCreateTextLayer(async ({text, size, color, bold}) => {
-  const layer = new TextLayer(540, 540, 0, 0)
+  const layer = new TextLayer(text.length * size * 5, size * 12, 0, 0)
 
-  layer.setText(text).setSize(size).setColor(color)
+  layer.setText(text).setSize(size).setColor(color).setResizable(false)
 
   if (bold) {
     await layer.setWeight('bold').render()

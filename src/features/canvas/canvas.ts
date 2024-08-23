@@ -35,10 +35,21 @@ class Canvas extends HTMLCanvasElement {
       .filter((layer) => layer.active)
       .sort((a, b) => a.order - b.order)
       .map(async (layer) => {
+        if (!this.context) return
+
         await layer.render()
         const {width, height} = layer
         const {x, y} = layer.position
         this.context?.drawImage(layer, x, y, width, height)
+
+        if (layer.hovered) {
+          const path = new Path2D()
+          path.rect(x, y, width, height)
+
+          this.context.lineWidth = 2
+          this.context.strokeStyle = 'rgba(255, 13, 233, 0.4)'
+          this.context.stroke(path)
+        }
       })
   }
 
@@ -78,34 +89,37 @@ class Canvas extends HTMLCanvasElement {
     if (this.#layer && this.#layer.dragging) {
       this.#layer.dragTo(position)
       this.render()
-    } else if (this.#layer && this.#layer.resizing) {
+    } else if (this.#layer && this.#layer.resizable && this.#layer.resizing) {
       this.#layer.resizeTo(position)
       this.render()
     } else {
-      const colliders = this.#layers.filter(({rect}) =>
-        position.isCollision(rect)
-      )
+      let hoveredLayer: Layer | null = null
 
-      const hoveredLayer = colliders.reduce((highest, current) => {
-        return current.order > highest.order ? current : highest
-      }, colliders[0])
+      for (const layer of this.#layers) {
+        if (layer.resizable && position.isCollision(layer.rect)) {
+          hoveredLayer = layer
+          const resizeDirection = this.#getResizeDirection(layer, position)
+
+          if (resizeDirection.x || resizeDirection.y) {
+            this.style.cursor =
+              resizeDirection.x && resizeDirection.y
+                ? 'nwse-resize'
+                : resizeDirection.x
+                ? 'ew-resize'
+                : 'ns-resize'
+          } else {
+            this.style.cursor = 'default'
+          }
+        } else {
+          layer.setHovered(false)
+        }
+      }
 
       if (hoveredLayer) {
-        const direction = this.#getResizeDirection(hoveredLayer, position)
-
-        if (direction.x || direction.y) {
-          this.style.cursor =
-            direction.x && direction.y
-              ? 'nwse-resize'
-              : direction.x
-              ? 'ew-resize'
-              : 'ns-resize'
-        } else {
-          this.style.cursor = 'default'
-        }
-      } else {
-        this.style.cursor = 'default'
+        hoveredLayer.setHovered(true)
       }
+
+      this.render()
     }
   }
 

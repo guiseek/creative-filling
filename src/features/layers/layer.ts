@@ -19,6 +19,8 @@ export abstract class Layer extends OffscreenCanvas {
 
   protected _resizeDirection = {x: false, y: false}
 
+  protected _hovered = false
+
   protected _active = true
 
   protected _order = 1
@@ -33,6 +35,14 @@ export abstract class Layer extends OffscreenCanvas {
 
   get resizing() {
     return this._resizing
+  }
+
+  get resizable() {
+    return this._resizable
+  }
+
+  get hovered() {
+    return this._hovered
   }
 
   get offset() {
@@ -82,6 +92,11 @@ export abstract class Layer extends OffscreenCanvas {
 
   protected setDragging(value: boolean) {
     this._dragging = value
+    return this
+  }
+
+  setHovered(value: boolean) {
+    this._hovered = value
     return this
   }
 
