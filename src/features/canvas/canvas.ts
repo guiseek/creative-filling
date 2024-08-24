@@ -7,6 +7,9 @@ import {dispatch} from '@websqnl/event-flow'
 class Canvas extends HTMLCanvasElement implements CanvasLike {
   context: CanvasRenderingContext2D | null
 
+  private offscreenCanvas: OffscreenCanvas
+  private offscreenContext: OffscreenCanvasRenderingContext2D | null
+
   #layers: LayerLike[] = []
   #activeLayer: LayerLike | null = null
 
@@ -15,6 +18,8 @@ class Canvas extends HTMLCanvasElement implements CanvasLike {
   constructor() {
     super()
     this.context = this.getContext('2d')
+    this.offscreenCanvas = new OffscreenCanvas(this.width, this.height)
+    this.offscreenContext = this.offscreenCanvas.getContext('2d')
   }
 
   addLayer(layer: LayerLike) {
@@ -36,9 +41,9 @@ class Canvas extends HTMLCanvasElement implements CanvasLike {
   }
 
   async render() {
-    if (!this.context) return
+    if (!this.offscreenContext || !this.context) return
 
-    this.context.clearRect(0, 0, this.width, this.height)
+    this.offscreenContext.clearRect(0, 0, this.width, this.height)
 
     const layers = this.#layers
       .filter((layer) => layer.active)
@@ -46,13 +51,18 @@ class Canvas extends HTMLCanvasElement implements CanvasLike {
 
     for (const layer of layers) {
       await layer.render()
-      this.#drawLayer(layer)
+      this.#drawLayer(layer, this.offscreenContext)
     }
+
+    this.context.clearRect(0, 0, this.width, this.height)
+    this.context.drawImage(this.offscreenCanvas, 0, 0)
   }
 
   setSize(size: number) {
     this.width = size
     this.height = size
+    this.offscreenCanvas.width = size
+    this.offscreenCanvas.height = size
   }
 
   setIsContextMenu(isContextMenu: boolean) {
@@ -73,7 +83,6 @@ class Canvas extends HTMLCanvasElement implements CanvasLike {
       const position = {x: e.pageX, y: e.pageY}
       dispatch(contextOpen({layer, position}))
     }
-    // dispatch(contextOpen({x: offsetX, y: offsetY}))
   }
 
   #handleMouseDown = ({offsetX, offsetY}: MouseEvent) => {
@@ -177,26 +186,34 @@ class Canvas extends HTMLCanvasElement implements CanvasLike {
     this.style.cursor = cursorStyle
   }
 
-  #drawLayer(layer: LayerLike) {
+  #drawLayer(
+    layer: LayerLike,
+    context: OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D
+  ) {
     const {width, height} = layer
     const {x, y} = layer.position
-    this.context?.drawImage(layer, x, y, width, height)
+    context.drawImage(layer, x, y, width, height)
 
     if (layer.hovered) {
-      this.#drawLayerBorder(x, y, width, height)
+      this.#drawLayerBorder(x, y, width, height, context)
     }
   }
 
-  #drawLayerBorder(x: number, y: number, width: number, height: number) {
+  #drawLayerBorder(
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    context: OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D
+  ) {
     const path = new Path2D()
     path.rect(x, y, width, height)
 
-    this.context!.lineWidth = 2
-
+    context.lineWidth = 2
     const style = `rgba(${getCustomProperty('--cf-primary-rgb')}, 0.4)`
-    this.context!.strokeStyle = style
+    context.strokeStyle = style
 
-    this.context!.stroke(path)
+    context.stroke(path)
   }
 }
 
