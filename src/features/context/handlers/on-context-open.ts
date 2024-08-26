@@ -27,6 +27,34 @@ onContextOpen(({layer, position}) => {
     new ContextButton(
       context,
       {
+        icon: icon.bringToFront,
+        text: 'Trazer para frente',
+      },
+      {
+        value: 'bring-to-front',
+      }
+    )
+  )
+  
+  context.addButton(
+    new ContextButton(
+      context,
+      {
+        icon: icon.sendToBack,
+        text: 'Enviar para trás',
+      },
+      {
+        value: 'send-to-back',
+      }
+    )
+  )
+
+  context.addDivider()
+
+  context.addButton(
+    new ContextButton(
+      context,
+      {
         icon: icon.delete,
         text: 'Remover',
         shortcut: 'Cmd+Del',

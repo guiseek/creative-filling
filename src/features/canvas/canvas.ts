@@ -23,7 +23,7 @@ class Canvas extends HTMLCanvasElement implements CanvasLike {
   }
 
   addLayer(layer: LayerLike) {
-    layer.setOrder(this.#layers.length + 1)
+    layer.setOrder(this.#layers.length)
     this.#layers.push(layer)
   }
 
