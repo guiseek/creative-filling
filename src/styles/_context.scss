@@ -40,6 +40,11 @@ menu.cf-context {
     background-color: rgb(var(--cf-surface-rgb));
     transition: background-color 250ms ease-in-out;
 
+    &[disabled] {
+      opacity: .4;
+      cursor: default;
+    }
+
     svg {
       width: 24px;
       color: rgba(var(--cf-onsurface-rgb), 0.4);

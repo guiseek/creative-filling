@@ -2,6 +2,7 @@ import {ContextButton} from '../context-button'
 import {onContextOpen} from '../events'
 import {icon} from '@constants/icon'
 import {Context} from '../context'
+import { canvas } from '@features/canvas'
 
 onContextOpen(({layer, position}) => {
   const context = new Context(layer)
@@ -23,6 +24,8 @@ onContextOpen(({layer, position}) => {
     context.addDivider()
   }
 
+  const orders = canvas.layers.map(l => l.order)
+  
   context.addButton(
     new ContextButton(
       context,
@@ -31,6 +34,7 @@ onContextOpen(({layer, position}) => {
         text: 'Trazer para frente',
       },
       {
+        disabled: layer.order === Math.max(...orders),
         value: 'bring-to-front',
       }
     )
@@ -44,6 +48,7 @@ onContextOpen(({layer, position}) => {
         text: 'Enviar para trás',
       },
       {
+        disabled: layer.order === Math.min(...orders),
         value: 'send-to-back',
       }
     )

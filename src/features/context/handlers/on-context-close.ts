@@ -3,11 +3,11 @@ import {canvas} from '@features/canvas'
 
 onContextClose(({context, option}) => {
   if (option === 'bring-to-front') {
-    context.layer.setOrder(context.layer.order + 1)
+    canvas.bringLayerToFront(context.layer)
   }
 
   if (option === 'send-to-back') {
-    context.layer.setOrder(context.layer.order - 1)
+    canvas.sendLayerToBack(context.layer)
   }
 
   if (option === 'remove') {

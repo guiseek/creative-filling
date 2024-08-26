@@ -11,6 +11,11 @@ class Canvas extends HTMLCanvasElement implements CanvasLike {
   private offscreenContext: OffscreenCanvasRenderingContext2D | null
 
   #layers: LayerLike[] = []
+
+  get layers() {
+    return this.#layers
+  }
+
   #activeLayer: LayerLike | null = null
 
   #isContextMenu = false
@@ -33,8 +38,8 @@ class Canvas extends HTMLCanvasElement implements CanvasLike {
   }
 
   addLayer(layer: LayerLike) {
-    layer.setOrder(this.#layers.length)
     this.#layers.push(layer)
+    layer.setOrder(this.#layers.length)
   }
 
   removeLayer(layer: LayerLike) {
@@ -54,7 +59,7 @@ class Canvas extends HTMLCanvasElement implements CanvasLike {
     if (!this.offscreenContext || !this.context) return
 
     this.offscreenContext.clearRect(0, 0, this.width, this.height)
-    
+
     if (this.fill) {
       this.offscreenContext.fillStyle = this.fill
       this.offscreenContext.fillRect(0, 0, this.width, this.height)
@@ -144,6 +149,7 @@ class Canvas extends HTMLCanvasElement implements CanvasLike {
       this.#activeLayer = null
       this.render()
     }
+    this.setIsContextMenu(false)
   }
 
   #getCollidingLayers(position: Vector2) {
@@ -229,6 +235,40 @@ class Canvas extends HTMLCanvasElement implements CanvasLike {
     context.strokeStyle = style
 
     context.stroke(path)
+  }
+
+  bringLayerToFront(layer: LayerLike) {
+    const order = layer.order + 1
+
+    const orders = this.layers.map((l) => l.order)
+
+    if (orders.includes(order)) {
+      for (const layer of this.layers) {
+        if (layer.order <= order) {
+          layer.setOrder(layer.order - 1)
+        }
+      }
+    }
+
+    layer.setOrder(order)
+    this.render().then()
+  }
+
+  sendLayerToBack(layer: LayerLike) {
+    const order = layer.order - 1
+
+    const orders = this.layers.map((l) => l.order)
+
+    if (orders.includes(order)) {
+      for (const layer of this.layers) {
+        if (layer.order >= order) {
+          layer.setOrder(layer.order + 1)
+        }
+      }
+    }
+
+    layer.setOrder(order)
+    this.render().then()
   }
 }
 

@@ -27,7 +27,7 @@ export abstract class Layer extends OffscreenCanvas implements LayerLike {
 
   protected _active = true
 
-  protected _order = 1
+  protected _order = 0
 
   get id() {
     return this._id
