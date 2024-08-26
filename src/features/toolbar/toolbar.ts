@@ -10,6 +10,7 @@ export class Toolbar extends HTMLMenuElement {
   buttons = {
     image: this.#button(icon.image, 'image', 'Select image'),
     text: this.#button(icon.text, 'text', 'Write text'),
+    fill: this.#button(icon.fill, 'fill', 'Format color fill'),
   }
 
   connectedCallback() {

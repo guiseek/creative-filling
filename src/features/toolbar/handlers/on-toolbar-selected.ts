@@ -1,5 +1,6 @@
 import {
   onToolbarSelected,
+  toolbarSelectFill,
   toolbarSelectImage,
   toolbarSelectText,
 } from '../events'
@@ -12,6 +13,9 @@ onToolbarSelected((action) => {
     }
     case 'text': {
       return dispatch(toolbarSelectText())
+    }
+    case 'fill': {
+      return dispatch(toolbarSelectFill())
     }
   }
 })

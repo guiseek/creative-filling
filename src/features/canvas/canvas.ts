@@ -15,6 +15,16 @@ class Canvas extends HTMLCanvasElement implements CanvasLike {
 
   #isContextMenu = false
 
+  #fill = ''
+
+  get fill() {
+    return this.#fill
+  }
+
+  setFill(fill: string) {
+    this.#fill = fill
+  }
+
   constructor() {
     super()
     this.context = this.getContext('2d')
@@ -44,6 +54,11 @@ class Canvas extends HTMLCanvasElement implements CanvasLike {
     if (!this.offscreenContext || !this.context) return
 
     this.offscreenContext.clearRect(0, 0, this.width, this.height)
+    
+    if (this.fill) {
+      this.offscreenContext.fillStyle = this.fill
+      this.offscreenContext.fillRect(0, 0, this.width, this.height)
+    }
 
     const layers = this.#layers
       .filter((layer) => layer.active)

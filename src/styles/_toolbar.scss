@@ -1,8 +1,7 @@
 menu.cf-toolbar {
   display: flex;
-  flex-flow: row wrap;
+  flex-direction: column;
   gap: 0.2em;
-  max-width: 6em;
   background-color: #dadada;
 
   margin: 0;
@@ -26,5 +25,9 @@ menu.cf-toolbar {
     svg {
       color: rgb(var(--cf-onsurface-rgb));
     }
+  }
+
+  @media (max-width: 640px) {
+    flex-direction: row;
   }
 }

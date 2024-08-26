@@ -21,7 +21,7 @@ interface RectLike {
   h: number
 }
 
-type LayerType = 'image' | 'text'
+type LayerType = 'image' | 'text' | 'fill'
 
 type TextWeight = 'bold' | 'normal'
 
@@ -106,8 +106,13 @@ interface TextForm {
   bold: boolean
 }
 
+interface FillForm {
+  color: string
+}
+
 interface StateEventMap {
   'form.text.submit': TextForm
+  'form.fill.submit': FillForm
 
   'canvas.render.request': void
   'canvas.update.size': CanvasSize
@@ -118,6 +123,7 @@ interface StateEventMap {
 
   'toolbar.select.image': void
   'toolbar.select.text': void
+  'toolbar.select.fill': void
   'toolbar.selected': LayerType
 
   'context.open': ContextOpenEvent
