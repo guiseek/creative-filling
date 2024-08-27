@@ -30,6 +30,10 @@ menu.cf-context {
 
     padding: 0.4em 0.6em;
 
+    color: rgb(var(--cf-onsurface-rgb));
+    box-shadow: none;
+    background-color: rgb(var(--cf-surface-rgb));
+
     gap: 1em;
     display: flex;
     flex-direction: row;

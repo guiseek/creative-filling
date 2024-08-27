@@ -117,6 +117,9 @@ interface StateEventMap {
   'canvas.render.request': void
   'canvas.update.size': CanvasSize
   'canvas.add.layer': LayerLike
+  'canvas.drag.over': DragEvent
+  'canvas.drag.leave': DragEvent
+  'canvas.drop.image': DragEvent
 
   'layer.create.image': string
   'layer.create.text': TextForm

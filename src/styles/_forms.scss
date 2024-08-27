@@ -56,3 +56,22 @@ dialog {
     background-color: rgba(0, 0, 0, 0.6);
   }
 }
+
+button {
+  background: #fff;
+  color: #383b3a;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 3px #ccc;
+  transition: transform 100ms;
+  
+  &:hover {
+    transform: translateY(1px);
+    box-shadow: 0 2px #ccc;
+  }
+  
+  &:active {
+    transform: translateY(3px);
+    box-shadow: 0 0 1px #ccc;
+  }
+}
