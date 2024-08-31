@@ -1,7 +1,7 @@
+import {getMimeType, loadImage} from '@shared/utils'
 import {createImageLayer} from '@features/layers'
 import {dispatch} from '@websqnl/event-flow'
 import {onCanvasDropImage} from '../events'
-import {loadImage} from '@shared/utils'
 import {canvas} from '../canvas'
 
 onCanvasDropImage((ev) => {
@@ -10,8 +10,12 @@ onCanvasDropImage((ev) => {
 
   const [file] = ev.dataTransfer?.files ?? []
   if (file) {
-    loadImage(file).then((data) => {
-      dispatch(createImageLayer(data))
+    getMimeType(file).then((mimeType) => {
+      if (mimeType && mimeType.startsWith('image/')) {
+        loadImage(file).then((data) => {
+          dispatch(createImageLayer(data))
+        })
+      }
     })
   }
 })
