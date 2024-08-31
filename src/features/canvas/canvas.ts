@@ -1,5 +1,5 @@
-import {getCustomProperty, throttle, Vector2} from '@shared/utils'
 import {builtIn} from '@websqnl/elements/shared'
+import {throttle, Vector2} from '@shared/utils'
 import {contextOpen} from '@features/context'
 import {dispatch} from '@websqnl/event-flow'
 
@@ -236,10 +236,15 @@ class Canvas extends HTMLCanvasElement implements CanvasLike {
     path.rect(x, y, width, height)
 
     context.lineWidth = 2
-    const style = `rgba(${getCustomProperty('--cf-primary-rgb')}, 0.4)`
-    context.strokeStyle = style
+
+    context.save()
+    context.filter = 'invert(100%)'
+    context.strokeStyle = 'rgba(0,0,0, 0.4)'
+    context.globalCompositeOperation = 'difference'
 
     context.stroke(path)
+
+    context.restore()
   }
 
   #displayLayerSize(
@@ -279,7 +284,8 @@ class Canvas extends HTMLCanvasElement implements CanvasLike {
     context.font = '12px "Segoe UI", sans-serif'
 
     context.save()
-    context.filter = 'invert(1)'
+    context.filter = 'invert(100%)'
+    context.fillStyle = 'rgba(0,0,0, 0.8)'
     context.globalCompositeOperation = 'difference'
 
     context.fillText(text, x, y)
