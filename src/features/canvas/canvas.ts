@@ -1,4 +1,4 @@
-import {getCustomProperty, Vector2} from '@shared/utils'
+import {getCustomProperty, throttle, Vector2} from '@shared/utils'
 import {builtIn} from '@websqnl/elements/shared'
 import {contextOpen} from '@features/context'
 import {dispatch} from '@websqnl/event-flow'
@@ -51,7 +51,7 @@ class Canvas extends HTMLCanvasElement implements CanvasLike {
   connectedCallback() {
     this.oncontextmenu = this.#onContextMenu
     this.onmousedown = this.#handleMouseDown
-    this.onmousemove = this.#handleMouseMove
+    this.onmousemove = throttle(this.#handleMouseMove, 50)
     this.onmouseup = this.#handleMouseUp
   }
 
@@ -72,6 +72,14 @@ class Canvas extends HTMLCanvasElement implements CanvasLike {
     for (const layer of layers) {
       await layer.render()
       this.#drawLayer(layer, this.offscreenContext)
+    }
+
+    if (this.#activeLayer && this.#activeLayer.resizing) {
+      this.#displayLayerSize(this.#activeLayer, this.offscreenContext)
+    }
+
+    if (this.#activeLayer && this.#activeLayer.dragging) {
+      this.#displayLayerPosition(this.#activeLayer, this.offscreenContext)
     }
 
     this.context.clearRect(0, 0, this.width, this.height)
@@ -207,10 +215,7 @@ class Canvas extends HTMLCanvasElement implements CanvasLike {
     this.style.cursor = cursorStyle
   }
 
-  #drawLayer(
-    layer: LayerLike,
-    context: OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D
-  ) {
+  #drawLayer(layer: LayerLike, context: OffscreenCanvasRenderingContext2D) {
     const {width, height} = layer
     const {x, y} = layer.position
     context.drawImage(layer, x, y, width, height)
@@ -225,7 +230,7 @@ class Canvas extends HTMLCanvasElement implements CanvasLike {
     y: number,
     width: number,
     height: number,
-    context: OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D
+    context: OffscreenCanvasRenderingContext2D
   ) {
     const path = new Path2D()
     path.rect(x, y, width, height)
@@ -235,6 +240,51 @@ class Canvas extends HTMLCanvasElement implements CanvasLike {
     context.strokeStyle = style
 
     context.stroke(path)
+  }
+
+  #displayLayerSize(
+    layer: LayerLike,
+    context: OffscreenCanvasRenderingContext2D
+  ) {
+    const {width, height} = layer
+    const {x, y} = layer.position
+
+    const text = `width: ${width}px - height: ${height}px`
+    const textMetrics = context.measureText(text)
+    const textX = x + width - textMetrics.width - 5
+    const textY = y + height - 5
+
+    this.#metaText(context, text, textX, textY)
+  }
+
+  #displayLayerPosition(
+    layer: LayerLike,
+    context: OffscreenCanvasRenderingContext2D
+  ) {
+    const {x, y} = layer.position
+
+    const text = `x: ${x}px - y: ${y}px`
+    const textX = x + 5
+    const textY = y + 15
+
+    this.#metaText(context, text, textX, textY)
+  }
+
+  #metaText(
+    context: OffscreenCanvasRenderingContext2D,
+    text: string,
+    x: number,
+    y: number
+  ) {
+    context.font = '12px "Segoe UI", sans-serif'
+
+    context.save()
+    context.filter = 'invert(1)'
+    context.globalCompositeOperation = 'difference'
+
+    context.fillText(text, x, y)
+
+    context.restore()
   }
 
   bringLayerToFront(layer: LayerLike) {
